@@ -1,22 +1,47 @@
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class floids extends PApplet {
+
 Flock flock;
 
-void setup() {
-  size(640, 360);
+
+// The setup() function is run once, when the program starts
+public void setup() {
+    // dimension of the window
   flock = new Flock();
   // Add an initial set of boids into the system
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 200; i++) {
     flock.addBoid(new Boid(width/2,height/2));
   }
 }
 
-void draw() {
+
+// Called directly after setup(), the draw() function continuously 
+// executes the lines of code contained inside its block until the program is stopped 
+// or noLoop() is called. draw() is called automatically and should never be called explicitly.
+ // All Processing programs update the screen at the end of draw(), never earlier.
+public void draw() {
   background(50);
   flock.run();
 }
 
 // Add a new boid into the System
-void mousePressed() {
-  flock.addBoid(new Boid(mouseX,mouseY));
+public void mousePressed() {
+  for (int i = 0; i < 2; i++) {
+    flock.addBoid(new Boid(mouseX,mouseY));
+  }
 }
 
 
@@ -30,13 +55,13 @@ class Flock {
     boids = new ArrayList<Boid>(); // Initialize the ArrayList
   }
 
-  void run() {
+  public void run() {
     for (Boid b : boids) {
       b.run(boids);  // Passing the entire list of boids to each boid individually
     }
   }
 
-  void addBoid(Boid b) {
+  public void addBoid(Boid b) {
     boids.add(b);
   }
 
@@ -67,32 +92,32 @@ class Boid {
     velocity = new PVector(cos(angle), sin(angle));
 
     position = new PVector(x, y);
-    r = 2.0;
+    r = 2.0f;
     maxspeed = 2;
-    maxforce = 0.03;
+    maxforce = 0.03f;
   }
 
-  void run(ArrayList<Boid> boids) {
+  public void run(ArrayList<Boid> boids) {
     flock(boids);
     update();
     borders();
     render();
   }
 
-  void applyForce(PVector force) {
+  public void applyForce(PVector force) {
     // We could add mass here if we want A = F / M
     acceleration.add(force);
   }
 
   // We accumulate a new acceleration each time based on three rules
-  void flock(ArrayList<Boid> boids) {
+  public void flock(ArrayList<Boid> boids) {
     PVector sep = separate(boids);   // Separation
     PVector ali = align(boids);      // Alignment
     PVector coh = cohesion(boids);   // Cohesion
     // Arbitrarily weight these forces
-    sep.mult(1.5);
-    ali.mult(1.0);
-    coh.mult(1.0);
+    sep.mult(1.5f);
+    ali.mult(1.0f);
+    coh.mult(1.0f);
     // Add the force vectors to acceleration
     applyForce(sep);
     applyForce(ali);
@@ -100,7 +125,7 @@ class Boid {
   }
 
   // Method to update position
-  void update() {
+  public void update() {
     // Update velocity
     velocity.add(acceleration);
     // Limit speed
@@ -112,7 +137,7 @@ class Boid {
 
   // A method that calculates and applies a steering force towards a target
   // STEER = DESIRED MINUS VELOCITY
-  PVector seek(PVector target) {
+  public PVector seek(PVector target) {
     PVector desired = PVector.sub(target, position);  // A vector pointing from the position to the target
     // Scale to maximum speed
     desired.normalize();
@@ -128,7 +153,7 @@ class Boid {
     return steer;
   }
 
-  void render() {
+  public void render() {
     // Draw a triangle rotated in the direction of velocity
     float theta = velocity.heading2D() + radians(90);
     // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
@@ -147,7 +172,7 @@ class Boid {
   }
 
   // Wraparound
-  void borders() {
+  public void borders() {
     if (position.x < -r) position.x = width+r;
     if (position.y < -r) position.y = height+r;
     if (position.x > width+r) position.x = -r;
@@ -156,7 +181,7 @@ class Boid {
 
   // Separation
   // Method checks for nearby boids and steers away
-  PVector separate (ArrayList<Boid> boids) {
+  public PVector separate (ArrayList<Boid> boids) {
     float desiredseparation = 25.0f;
     PVector steer = new PVector(0, 0, 0);
     int count = 0;
@@ -195,7 +220,7 @@ class Boid {
 
   // Alignment
   // For every nearby boid in the system, calculate the average velocity
-  PVector align (ArrayList<Boid> boids) {
+  public PVector align (ArrayList<Boid> boids) {
     float neighbordist = 50;
     PVector sum = new PVector(0, 0);
     int count = 0;
@@ -226,7 +251,7 @@ class Boid {
 
   // Cohesion
   // For the average position (i.e. center) of all nearby boids, calculate steering vector towards that position
-  PVector cohesion (ArrayList<Boid> boids) {
+  public PVector cohesion (ArrayList<Boid> boids) {
     float neighbordist = 50;
     PVector sum = new PVector(0, 0);   // Start with empty vector to accumulate all positions
     int count = 0;
@@ -243,6 +268,16 @@ class Boid {
     } 
     else {
       return new PVector(0, 0);
+    }
+  }
+}
+  public void settings() {  size(2000, 1100); }
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "--present", "--window-color=#666666", "--stop-color=#cccccc", "floids" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
     }
   }
 }
