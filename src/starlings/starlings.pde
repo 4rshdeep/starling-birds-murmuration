@@ -2,25 +2,22 @@ Flock flock;
 PFont f;
 int count;
 int BOIDS = 400;
+ArrayList<Boid> boids; // An ArrayList for all the boids
+
 // The setup() function is run once, when the program starts
 void setup() {
-  
   fullScreen();
-  // size(2000, 1100);  // dimension of the window
   flock = new Flock();
+
   // Add an initial set of boids into the system
   for (int i = 0; i < BOIDS; i++) {
     flock.addBoid(new Boid(width/2,height/2));
   }
-  // String[] fontList = PFont.list();
-  // printArray(fontList);
+
   f = createFont("Roboto Regular",16,true);
   textFont(f,18);
   count = BOIDS;
-
-
 }
-
 
 // Called directly after setup(), the draw() function continuously 
 // executes the lines of code contained inside its block until the program is stopped 
@@ -30,13 +27,11 @@ void draw() {
   background(50);
   fill(255, 200);
   text(count,1757,50);
-  flock.run();
+  flock.run_boids();
 }
 
 // Add a new boid into the System
 void mousePressed() {
-  // println("mouseX: "+mouseX);
-  // println("mouseY: "+mouseY);
   for (int i = 0; i < 20; i++) {
     flock.addBoid(new Boid(mouseX,mouseY));
   }
@@ -44,15 +39,15 @@ void mousePressed() {
 
 // The Flock (a list of Boid objects)
 class Flock {
-  ArrayList<Boid> boids; // An ArrayList for all the boids
 
   Flock() {
     boids = new ArrayList<Boid>(); // Initialize the ArrayList
   }
 
-  void run() {
+  void run_boids() {
     for (Boid b : boids) {
-      b.run(boids);  // Passing the entire list of boids to each boid individually
+      b.start();
+      // b.make_run();  // Passing the entire list of boids to each boid individually
     }
   }
 
@@ -68,7 +63,7 @@ class Flock {
 
 // The Boid class
 
-class Boid {
+class Boid extends Thread{
 
   PVector position;
   PVector velocity;
@@ -87,7 +82,20 @@ class Boid {
     maxforce     = 0.03;
   }
 
-  void run(ArrayList<Boid> boids) {
+  public void run() {
+    make_run();
+    // try
+    // {
+    //   make_run();
+    // }
+    // catch (Exception e)
+    // {
+    //     // Throwing an exception
+    //     System.out.println ("Exception is caught");
+    // }
+  }
+
+  void make_run() {
     flock(boids);
     update();
     borders();
