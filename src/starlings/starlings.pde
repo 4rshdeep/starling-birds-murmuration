@@ -1,31 +1,21 @@
 Flock flock;
 PFont f;
 int count;
-int BOIDS = 400;
-// The setup() function is run once, when the program starts
+int BOIDS = 200;
+
 void setup() {
   
   fullScreen();
-  // size(2000, 1100);  // dimension of the window
   flock = new Flock();
-  // Add an initial set of boids into the system
   for (int i = 0; i < BOIDS; i++) {
     flock.addBoid(new Boid(width/2,height/2));
   }
-  // String[] fontList = PFont.list();
-  // printArray(fontList);
   f = createFont("Roboto Regular",16,true);
   textFont(f,18);
   count = BOIDS;
 
-
 }
 
-
-// Called directly after setup(), the draw() function continuously 
-// executes the lines of code contained inside its block until the program is stopped 
-// or noLoop() is called. draw() is called automatically and should never be called explicitly.
- // All Processing programs update the screen at the end of draw(), never earlier.
 void draw() {
   background(50);
   fill(255, 200);
@@ -33,59 +23,128 @@ void draw() {
   flock.run();
 }
 
-// Add a new boid into the System
 void mousePressed() {
-  // println("mouseX: "+mouseX);
-  // println("mouseY: "+mouseY);
   for (int i = 0; i < 20; i++) {
     flock.addBoid(new Boid(mouseX,mouseY));
   }
 }
 
-// The Flock (a list of Boid objects)
 class Flock {
-  ArrayList<Boid> boids; // An ArrayList for all the boids
+  ArrayList<Boid> boids;
 
   Flock() {
-    boids = new ArrayList<Boid>(); // Initialize the ArrayList
+    boids = new ArrayList<Boid>(); 
   }
+
+  //  This is for multithreading some errors are there
+  // class Parallel extends Thread {
+  //   int start;
+  //   int end;
+  //   ArrayList<Boid> saved_copy;
+  //   String id;
+
+  //   Parallel(String a, int s, int e, ArrayList<Boid> co) {
+  //       start = s;
+  //       end = e;
+  //       saved_copy = co;
+  //       id = a;
+  //   }
+
+  //   public void run()
+  //   {
+  //       try
+  //       {
+  //           for (int i = start; i < end; ++i) {
+  //               println("thread: "+ id + " i: " + i);
+  //               boids.get(i).run(saved_copy);
+  //           }
+  //       }
+  //       catch (Exception e)
+  //       {
+  //           println("start: "+start);
+  //           println("end: "+end);
+  //           e.printStackTrace();
+  //       }
+  //   }
+  // }
 
   void run() {
     for (Boid b : boids) {
-      b.run(boids);  // Passing the entire list of boids to each boid individually
+        b.run(boids);
     }
+    // ArrayList<Boid> save = new ArrayList<Boid>(boids);
+    // for (Boid b : boids) {
+    //     Boid temp = b.clone();
+    //     save.add(temp);
+    // }
+    
+    // Parallel p1 = new Parallel("t1", 0, 250, save);
+    // Parallel p2 = new Parallel("t2", 250, 500, save);
+    // Parallel p3 = new Parallel("t3", 500, 750, save);
+    // Parallel p4 = new Parallel("t4", 750, 1000, save);
+    
+    // p1.start();
+    // p2.start();
+    // p3.start();
+    // p4.start();
+
+    // try {
+    //     p1.join();
+    // } catch (InterruptedException e) {
+    //     e.printStackTrace();
+    // }
+    // try {
+    //     p2.join();
+    // } catch (InterruptedException e) {
+    //     e.printStackTrace();
+    // }
+    // try {
+    //     p3.join();
+    // } catch (InterruptedException e) {
+    //     e.printStackTrace();
+    // }
+    // try {
+    //     p4.join();
+    // } catch (InterruptedException e) {
+    //     e.printStackTrace();
+    // }
   }
 
   void addBoid(Boid b) {
     boids.add(b);
     count += 1; 
   }
-
 }
 
 
-
-
-// The Boid class
-
 class Boid {
-
   PVector position;
   PVector velocity;
   PVector acceleration;
   float r;
-  float maxforce;    // Maximum steering force
-  float maxspeed;    // Maximum speed
+  float maxforce;
+  float maxspeed;
+  float angle;
 
     Boid(float x, float y) {
-    acceleration = new PVector(0, 0); // PVector -> two or three dimensional vector
-    float angle  = random(TWO_PI);
+    acceleration = new PVector(0, 0);
+    angle        = random(TWO_PI);
     velocity     = new PVector(cos(angle), sin(angle));
     position     = new PVector(x, y);
     r            = 2.0;
     maxspeed     = 2;
     maxforce     = 0.03;
   }
+
+  Boid clone() {
+    Boid b         = new Boid(position.x, position.y);
+    b.position     = position.copy();
+    b.velocity     = velocity.copy();
+    b.acceleration = acceleration.copy();
+    b.angle        = angle;
+    return b;
+  }
+  
 
   void run(ArrayList<Boid> boids) {
     flock(boids);
@@ -95,23 +154,18 @@ class Boid {
   }
 
   void applyForce(PVector force) {
-    // We could add mass here if we want A = F / M
     acceleration.add(force);
   }
 
-  //  We accumulate a new acceleration each time based on three rules
-  //  This just updates the acceleration and that is applied in the run method 
   void flock(ArrayList<Boid> boids) {
     PVector sep = separate(boids);   // Separation
     PVector ali = align(boids);      // Alignment
     PVector coh = cohesion(boids);   // Cohesion
 
-    // Arbitrarily weight these forces
     sep.mult(1.5);
     ali.mult(1.0);
     coh.mult(1.0);
 
-    // Add the force vectors to acceleration
     applyForce(sep);
     applyForce(ali);
     applyForce(coh);
@@ -135,9 +189,6 @@ class Boid {
     // Scale to maximum speed
     desired.normalize();
     desired.mult(maxspeed);
-
-    // Above two lines of code below could be condensed with new PVector setMag() method
-    // Not using this method until Processing.js catches up
     // desired.setMag(maxspeed);
 
     // Steering = Desired minus Velocity
