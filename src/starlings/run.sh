@@ -1,1 +1,1 @@
-processing-java --force --output="./bin" --sketch="../starlings" --run
+processing-java --force --output="./output" --sketch="../starlings" --run
