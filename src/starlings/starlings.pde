@@ -21,12 +21,16 @@ boolean f_avoid = true;
 boolean f_noise = true;
 boolean f_coh = true;
 
+boolean show_frate = true;
+String f_rate;
+
 
 void setup() {
 
   fullScreen();
   flock = new Flock();
   count = 0;
+  f_rate = "";
 
   for (int x = 100; x < width - 100; x+= 100) {
     for (int y = 100; y < height - 100; y+= 100) {
@@ -46,7 +50,14 @@ void draw() {
 
   background(50);
   fill(255, 200);
-  text(count,1757,50);
+  if (show_frate) {
+    f_rate = "Total boids: " + count + "\n" + "Framerate: " + round(frameRate) + "\n";
+  }
+  else {
+    f_rate = "Total boids: " + count + "\n" ;
+  }
+  text(f_rate, 133, 60);
+
   flock.run();
 
   for (int i = 0; i < obstacles.size(); i++) {
@@ -68,6 +79,8 @@ void draw() {
 
 
 void mousePressed() {
+    // println("mouseX: "+mouseX);
+    // println("mouseY: "+mouseY);
     switch (option) {
         case "boids" :
             for (int i = 0; i < 20; i++) {
@@ -86,6 +99,11 @@ void keyPressed () {
   } else if (key == 'w') {
     option = "obstacles";
     message("Place obstacles");
+    
+  } else if (key == 'f') {
+    option = "frate";
+    show_frate = !show_frate;
+    message("frate " + on(show_frate));
   } else if (key == '-') {
     message("Decreased scale");
     globalScale *= 0.8;
