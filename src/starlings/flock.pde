@@ -35,10 +35,14 @@ class Flock {
 
   void run() {
     save = new ArrayList<Boid>();
-
+    energy = 0.0;
+    power = 0.0;
+    
     for (Boid b : boids) {
         Boid temp = b.clone();
         save.add(temp);
+        energy += b.get_energy() ;
+        power += b.get_power() ;
     }
 
     // threads 

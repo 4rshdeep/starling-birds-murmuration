@@ -32,7 +32,15 @@ class Boid {
         b.angle        = angle;
         return b;
     }
-
+    
+    float get_energy() {
+      return (0.5 * mass * ( (velocity.x * velocity.x) + (velocity.y * velocity.y) ) );
+    }
+    
+    float get_power() {
+      return ( mass * ( (velocity.x * acceleration.x) + (velocity.y * acceleration.y) ) );
+    }
+    
     void run(ArrayList<Boid> boids) {
         time = (time+1)%5;
         if (time==0) {

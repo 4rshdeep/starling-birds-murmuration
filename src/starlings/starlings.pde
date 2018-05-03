@@ -2,6 +2,9 @@ Flock flock;
 PFont f;
 int count;
 int BOIDS = 200;
+float mass = 5.0;
+float energy=0.0;
+float power = 0.0;
 
 float avoidRadius = 90;
 String option = "boids";
@@ -47,7 +50,7 @@ void setup() {
 }
 
 void draw() {
-
+  
   background(50);
   fill(255, 200);
   if (show_frate) {
@@ -57,9 +60,9 @@ void draw() {
     f_rate = "Total boids: " + count + "\n" ;
   }
   text(f_rate, 133, 60);
-
+  text(("Energy: " + energy + "\n" + "Power: " + power),1620, 60);
   flock.run();
-
+  
   for (int i = 0; i < obstacles.size(); i++) {
     Obstacle current = obstacles.get(i);
     current.draw();
@@ -136,4 +139,3 @@ void message (String in) {
    messageText = in;
    messageTimer = (int) frameRate * 3;
 }
-
