@@ -83,7 +83,7 @@ void mousePressed() {
     // println("mouseY: "+mouseY);
     switch (option) {
         case "boids" :
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 2; i++) {
                 flock.addBoid(new Boid(mouseX,mouseY));
             }               
             break;        
