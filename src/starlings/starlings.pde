@@ -26,7 +26,7 @@ boolean f_coh = true;
 
 boolean show_frate = true;
 String f_rate;
-
+float t;
 
 void setup() {
 
@@ -47,11 +47,12 @@ void setup() {
 
   neighbourRadius = 60;
   obstacles = new ArrayList<Obstacle>();
+  t = 0;
 }
 
 void draw() {
   
-  background(50);
+  background(25);
   fill(255, 200);
   if (show_frate) {
     f_rate = "Total boids: " + count + "\n" + "Framerate: " + round(frameRate) + "\n";
@@ -75,6 +76,12 @@ void draw() {
   if(messageTimer > 0) {
     fill((min(30, messageTimer) / 30.0) * 255.0);
     text(messageText,111,924);
+   }
+
+   t = (t+1)%50;
+   if (t==0) {
+       power = abs(flock.flock_power);
+       energy = flock.flock_energy;
    }
 
 }

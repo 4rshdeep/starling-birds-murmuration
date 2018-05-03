@@ -1,8 +1,12 @@
 class Flock {
   ArrayList<Boid> boids;
+  float flock_energy;
+  float flock_power;
 
   Flock() {
-    boids = new ArrayList<Boid>(); 
+    boids        = new ArrayList<Boid>(); 
+    flock_energy = 0.0;
+    flock_power  = 0.0;
   }
 
   class Parallel extends Thread {
@@ -35,14 +39,14 @@ class Flock {
 
   void run() {
     save = new ArrayList<Boid>();
-    energy = 0.0;
-    power = 0.0;
+    flock_energy = 0.0;
+    flock_power = 0.0;
     
     for (Boid b : boids) {
         Boid temp = b.clone();
         save.add(temp);
-        energy += b.get_energy() ;
-        power += b.get_power() ;
+        flock_energy += b.get_energy() ;
+        flock_power += b.boid_power ;
     }
 
     // threads 

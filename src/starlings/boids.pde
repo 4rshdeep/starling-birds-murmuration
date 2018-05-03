@@ -9,6 +9,7 @@ class Boid {
     float angle;
     float shade;
     int time;
+    float boid_power;
     ArrayList<Boid> neighbours;
 
     Boid(float x, float y) {
@@ -22,6 +23,7 @@ class Boid {
         shade        = random(255);
         time         = int(random(10));
         neighbours   = new ArrayList<Boid>();
+        boid_power   = 0.0;
     }
 
     Boid clone() {
@@ -42,6 +44,7 @@ class Boid {
     }
     
     void run(ArrayList<Boid> boids) {
+        // power = 0;
         time = (time+1)%5;
         if (time==0) {
             getNeighbours();
@@ -92,6 +95,7 @@ class Boid {
     velocity.limit(maxspeed);
     position.add(velocity);
     // Reset accelertion to 0 each cycle
+    boid_power = get_power();
     acceleration.mult(0);
   }
 
